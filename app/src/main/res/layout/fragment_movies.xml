@@ -2,8 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context="com.abdulaziz.moviesapp.ui.home.movies.MoviesFragment">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/movies_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="Movies"
+        app:titleTextColor="#FFF"
+        android:background="@color/colorPrimary">
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/movies_recycler_view"

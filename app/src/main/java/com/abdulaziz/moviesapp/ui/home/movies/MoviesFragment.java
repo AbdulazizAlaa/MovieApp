@@ -8,8 +8,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -41,6 +46,10 @@ public class MoviesFragment extends Fragment {
     private RecyclerView moviesList;
     private MoviesAdapter adapter;
     private GridLayoutManager layoutManager;
+
+    Callback<com.abdulaziz.moviesapp.data.model.Response> callbackHandler;//callback handler for movies requests
+
+    private Toolbar toolbar;
 
     private OnMoviesFragmentInteractionListener mListener;
 
@@ -76,6 +85,31 @@ public class MoviesFragment extends Fragment {
     private void init(){
         Log.i(TAG, "init: ");
 
+        //setting up toolbar
+        toolbar = (Toolbar) getView().findViewById(R.id.movies_toolbar);
+        toolbar.inflateMenu(R.menu.home_menu);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.home_popular:
+                        Log.i(TAG, "onMenuItemClick: popular");
+                        Service.Creator.getService().getPopularMovies(api_key).enqueue(callbackHandler);
+                        break;
+                    case R.id.home_top_rated:
+                        Log.i(TAG, "onMenuItemClick: top rated");
+                        Service.Creator.getService().getTopRatedMovies(api_key).enqueue(callbackHandler);
+                        break;
+                    case R.id.home_fav:
+                        Log.i(TAG, "onMenuItemClick: favourite");
+
+                        break;
+                }
+                return false;
+            }
+        });
+
+        //setting up movies adapter
         movies = new ArrayList<Movie>();
         adapter = new MoviesAdapter(getContext(), movies);
         moviesList = (RecyclerView) getView().findViewById(R.id.movies_recycler_view);
@@ -85,7 +119,16 @@ public class MoviesFragment extends Fragment {
         moviesList.setLayoutManager(layoutManager);
         moviesList.setAdapter(adapter);
 
-        Service.Creator.getService().getPopularMovies(api_key).enqueue(new Callback<com.abdulaziz.moviesapp.data.model.Response>() {
+        adapter.setOnItemClickListener(new MoviesAdapter.onItemClickListener() {
+            @Override
+            public void onItemClick(Movie movie) {
+                Log.i(TAG, "onItemClick: "+movie.getTitle());
+                mListener.onMoviesFragmentInteraction("show_movie", movie.getTitle());
+            }
+        });
+
+        //making the popular movies request
+       callbackHandler = new Callback<com.abdulaziz.moviesapp.data.model.Response>() {
             @Override
             public void onResponse(Call<com.abdulaziz.moviesapp.data.model.Response> call, Response<com.abdulaziz.moviesapp.data.model.Response> response) {
                 Log.i(TAG, "onResponse: "+response.isSuccessful());
@@ -102,7 +145,9 @@ public class MoviesFragment extends Fragment {
             public void onFailure(Call<com.abdulaziz.moviesapp.data.model.Response> call, Throwable t) {
                 Log.i(TAG, "onFailure: "+t.getMessage());
             }
-        });
+        };
+
+        Service.Creator.getService().getPopularMovies(api_key).enqueue(callbackHandler);
     }
 
     @Override
