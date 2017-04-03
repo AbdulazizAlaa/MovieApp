@@ -1,6 +1,7 @@
 package com.abdulaziz.moviesapp.ui.home;
 
 import android.net.Uri;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,36 +34,29 @@ public class HomeActivity extends AppCompatActivity implements
     }
 
     private void init(){
-        //defining the view pager for fragments
-        viewPager = (ViewPager) findViewById(R.id.home_view_pager);
+        //show movies fragment
+        MoviesFragment moviesFragment = MoviesFragment.newInstance();
 
-        fragmentAdapter = new PagerAdapter(getSupportFragmentManager());
-
-        fragmentAdapter.addFragment(MoviesFragment.newInstance());
-        fragmentAdapter.addFragment(MovieFragment.newInstance());
-
-        viewPager.setAdapter(fragmentAdapter);
+        getSupportFragmentManager().beginTransaction().add(R.id.activity_home, moviesFragment).commit();
     }
 
     @Override
     public void onMoviesFragmentInteraction(String action, String message) {
         if(action.equals("show_movie")){
             Log.i("home", "onMoviesFragmentInteraction: "+message);
-            viewPager.setCurrentItem(1);
+            MovieFragment movieFragment = MovieFragment.newInstance(message);
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            transaction.replace(R.id.activity_home, movieFragment);
+            transaction.addToBackStack(null);
+
+            transaction.commit();
         }
     }
 
     @Override
     public void onMovieFragmentInteraction(String action, String message) {
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(viewPager.getCurrentItem() == 0){
-            super.onBackPressed();
-        }else {
-            viewPager.setCurrentItem(viewPager.getCurrentItem()-1);
-        }
     }
 }

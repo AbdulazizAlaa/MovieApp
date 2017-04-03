@@ -65,7 +65,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MyViewHold
         holder.ratingTV.setText(movie.getRating());
 
         Picasso.with(mContext)
-                .load("http://image.tmdb.org/t/p/w500"+movie.getPoster())
+                .load(movie.getPoster())
                 .into(holder.posterIV);
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {

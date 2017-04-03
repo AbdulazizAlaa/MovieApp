@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.abdulaziz.moviesapp.R;
+import com.abdulaziz.moviesapp.data.local.DatabaseHandler;
 import com.abdulaziz.moviesapp.data.model.Movie;
 import com.abdulaziz.moviesapp.data.remote.Service;
 
@@ -102,7 +103,14 @@ public class MoviesFragment extends Fragment {
                         break;
                     case R.id.home_fav:
                         Log.i(TAG, "onMenuItemClick: favourite");
+                        DatabaseHandler databaseHandler = new DatabaseHandler(getContext());
 
+                        movies.clear();
+                        movies.addAll(databaseHandler.getMovies());
+
+                        Log.i(TAG, "onMenuItemClick: "+databaseHandler.getMovies().get(0).getPoster());
+
+                        adapter.notifyDataSetChanged();
                         break;
                 }
                 return false;
@@ -123,7 +131,7 @@ public class MoviesFragment extends Fragment {
             @Override
             public void onItemClick(Movie movie) {
                 Log.i(TAG, "onItemClick: "+movie.getTitle());
-                mListener.onMoviesFragmentInteraction("show_movie", movie.getTitle());
+                mListener.onMoviesFragmentInteraction("show_movie", movie.getId());
             }
         });
 
